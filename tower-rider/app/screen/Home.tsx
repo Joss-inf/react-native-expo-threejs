@@ -10,17 +10,17 @@ const Home: React.FC = () => {
                     <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.rankingButton} onPress={() => {}}>
-                    <Text style={styles.buttonText}>Ranking</Text>
+                <TouchableOpacity style={styles.inventaryButton} onPress={() => {}}>
+                    <Text style={styles.buttonText}>Inventary</Text>
                 </TouchableOpacity>
 
                 <View style={styles.buttonRow}>
 
-                <TouchableOpacity style={styles.optionsButton} onPress={() => {}}>
-                    <Text style={styles.buttonText}>Inventary</Text>
+                <TouchableOpacity style={styles.rankingButton} onPress={() => {}}>
+                    <Text style={styles.buttonText}>Ranking</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.inventoryButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.optionsButton} onPress={() => {}}>
                     <Text style={styles.buttonText}>Options</Text>
                 </TouchableOpacity>
         </View>
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',  
         alignItems: 'center',},
 
-    rankingButton:{
+    inventaryButton:{
         width: '80%',  
         paddingVertical: 10,  
         marginBottom: 10,  
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    inventoryButton:{
+    rankingButton:{
         width: '48%',  
         paddingVertical: 10,  
         borderRadius: 10, 
