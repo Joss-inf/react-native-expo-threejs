@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { router } from "expo-router";
 
 const Home = () : JSX.Element  => {
     return (
@@ -16,7 +17,7 @@ const Home = () : JSX.Element  => {
 
                 <View style={styles.buttonRow}>
 
-                <TouchableOpacity style={styles.rankingButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.rankingButton} onPress={() => router.push('/screen/Score')}>
                     <Text style={styles.buttonText}>Ranking</Text>
                 </TouchableOpacity>
 
