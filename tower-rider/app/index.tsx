@@ -34,19 +34,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#e6e6fa'
+        backgroundColor: '#B0E7F5'
     },
 
     title:{
-        fontSize: 32,
+        fontSize: 40,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#191970'
+        color: 'white',
     },
 
     buttonText: {
-        fontSize: 18,
+        fontSize: 23,
         fontWeight: 'bold',
+        color: 'white',
     },
 
     playButton:{
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,  
         marginBottom: 10,  
         borderRadius: 10,  
-        backgroundColor: '#D3D3D3',  
+        backgroundColor: '#FEC771',  
         justifyContent: 'center',  
         alignItems: 'center',},
 
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,  
         marginBottom: 10,  
         borderRadius: 10,  
-        backgroundColor: '#D3D3D3',  
+        backgroundColor: '#B4DEB8',  
         justifyContent: 'center',  
         alignItems: 'center',
     },
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
         width: '48%',  
         paddingVertical: 10,  
         borderRadius: 10,  
-        backgroundColor: '#D3D3D3',  
+        backgroundColor: '#DFC5FE',  
         justifyContent: 'center', 
         alignItems: 'center',
     },
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
         width: '48%',  
         paddingVertical: 10,  
         borderRadius: 10, 
-        backgroundColor: '#D3D3D3',  
+        backgroundColor: '#FFC2D8',  
         justifyContent: 'center',  
         alignItems: 'center',
     },
