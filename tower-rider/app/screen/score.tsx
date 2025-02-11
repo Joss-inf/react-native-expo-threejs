@@ -1,26 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { useRouter } from 'expo-router';
 
-
-interface scoreList {
-  score:number
-  id: number,
-  name:string,
+interface ScoreList {
+  score: number;
+  name: string;
 }
 
-interface Props {
-  scores: scoreList[];
-}
-const scores:scoreList[] = [
-  { id: 1, name: 'Player1', score: 1500 },
-  { id: 2, name: 'Player2', score: 1200 },
-  { id: 3, name: 'Player3', score: 1100 },
-  { id: 4, name: 'Player4', score: 900 },
-  { id: 5, name: 'Player5', score: 800 },
-];
-const ScoreScreen = () : JSX.Element  => {
+const ScoreScreen = (): JSX.Element => {
   const router = useRouter();
+  const [scores, setScores] = useState<ScoreList[]>([]);
+
+  // Charger les scores depuis un fichier JSON local
+  useEffect(() => {
+    const loadScores = async () => {
+      try {
+        const response = await fetch(require('../assets/scores.json'));  // Charge le fichier JSON
+        const data: ScoreList[] = await response.json();
+
+        // Trier les scores par ordre décroissant
+        const sortedScores = data.sort((a, b) => b.score - a.score);
+        setScores(sortedScores);
+      } catch (error) {
+        console.error('Error loading scores:', error);
+      }
+    };
+
+    loadScores();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -35,9 +42,10 @@ const ScoreScreen = () : JSX.Element  => {
             <Text style={styles.score}>{item.score} pts</Text>
           </View>
         )}
+        keyExtractor={(item, index) => index.toString()}  // Utilisation de l'index comme clé
       />
 
-<Button title="Home" onPress={() => router.replace('/')} />
+      <Button title="Home" onPress={() => router.replace('/')} />
     </View>
   );
 };
@@ -47,38 +55,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#222',
     padding: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 20,
   },
   scoreItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%',
+    width: '100%',
     padding: 10,
-    marginVertical: 5,
-    backgroundColor: '#333',
-    borderRadius: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   rank: {
-    fontSize: 20,
     fontWeight: 'bold',
-    color: '#FFD700',
+    fontSize: 18,
   },
   name: {
     fontSize: 18,
-    color: '#fff',
-    flex: 1,
-    textAlign: 'center',
   },
   score: {
     fontSize: 18,
-    color: '#fff',
   },
 });
 
