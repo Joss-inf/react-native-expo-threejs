@@ -7,11 +7,11 @@ const Home = () : JSX.Element  => {
         <View style={styles.container}>
                 <Text style={styles.title}>Tower Rider</Text>
 
-                <TouchableOpacity style={styles.playButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.playButton} onPress={() => router.push('/screen/game')}>
                     <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.inventaryButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.inventaryButton} onPress={() => router.push('/screen/inventory')}>
                     <Text style={styles.buttonText}>Inventary</Text>
                 </TouchableOpacity>
 
@@ -21,7 +21,7 @@ const Home = () : JSX.Element  => {
                     <Text style={styles.buttonText}>Ranking</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.optionsButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.optionsButton} onPress={() => router.push('/screen/settings')}>
                     <Text style={styles.buttonText}>Options</Text>
                 </TouchableOpacity>
         </View>

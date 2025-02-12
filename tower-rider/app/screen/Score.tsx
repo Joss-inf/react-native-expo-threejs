@@ -7,14 +7,13 @@ interface ScoreList {
   name: string;
 }
 
-import scoresData from '../data/score.json'; // Charge directement le JSON comme un objet
-
+import scoresData from '../data/score.json'; 
 const ScoreScreen = (): JSX.Element => {
   const router = useRouter();
   const [scores, setScores] = useState<ScoreList[]>([]);
 
   useEffect(() => {
-    // Trier les scores et les stocker
+    
     setScores([...scoresData].sort((a, b) => b.score - a.score));
   }, []);
 
@@ -22,7 +21,7 @@ const ScoreScreen = (): JSX.Element => {
     <View style={styles.container}>
       <Text style={styles.title}>Leaderboard</Text>
 
-      {/* Conteneur global pour tous les scores */}
+      {}
       <View style={styles.scoreListContainer}>
         <FlatList
           data={scores}
@@ -54,25 +53,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#B0E7F5'
   },
   title: {
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: 'bold',
     marginBottom: 20,
     color: 'white',
   },
-  // Conteneur qui enveloppe tous les scores
   scoreListContainer: {
-    backgroundColor: '#B4DEB8', // Fond bleu nuit
-    borderRadius: 10, // Coins arrondis
-    padding: 15, // Espacement interne
-    width: '100%', // Occuper toute la largeur
-    marginVertical: 20, // Espacement entre les autres éléments
-    shadowColor: '#000', // Ombre du conteneur
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
-    elevation: 5, // Ombre sous Android
+    backgroundColor: '#B4DEB8', 
+    borderRadius: 10, 
+    padding: 15, 
+    width: '100%', 
+    marginVertical: 20, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 2, 
   },
-  // Style de chaque ligne (score individuel)
   scoreRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -84,25 +81,29 @@ const styles = StyleSheet.create({
   rank: {
     fontWeight: 'bold',
     fontSize: 18,
-    color: '#ffffff', // Texte en blanc
+    color: '#ffffff',
   },
   name: {
     fontSize: 18,
-    color: '#ffffff', // Texte en blanc
+    color: '#ffffff', 
   },
   score: {
     fontSize: 18,
-    color: '#ffffff', // Texte en blanc
+    color: '#ffffff', 
   },
   backhButton:{
-    width: '48%',  
+    width: '30%',  
     paddingVertical: 10,  
     borderRadius: 10, 
-    backgroundColor: '#FFC2D8',  
+    backgroundColor: '#FEC771',  
     justifyContent: 'center',  
     alignItems: 'center',
 },
-backhText:{}
+backhText:{
+  color: "white",
+  fontWeight: 'bold',
+  fontSize: 15
+}
 
   
 });
