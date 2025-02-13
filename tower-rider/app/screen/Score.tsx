@@ -19,7 +19,7 @@ const ScoreScreen = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Leaderboard</Text>
+      <Text style={styles.title}>Ranking</Text>
 
       {}
       <View style={styles.scoreListContainer}>
@@ -81,15 +81,15 @@ const styles = StyleSheet.create({
   rank: {
     fontWeight: 'bold',
     fontSize: 18,
-    color: '#ffffff',
+    color: 'white',
   },
   name: {
     fontSize: 18,
-    color: '#ffffff', 
+    color: 'white', 
   },
   score: {
     fontSize: 18,
-    color: '#ffffff', 
+    color: 'white', 
   },
   backhButton:{
     width: '30%',  

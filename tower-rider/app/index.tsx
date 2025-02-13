@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from "expo-router";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 const Home = () : JSX.Element  => {
     return (
@@ -21,10 +23,13 @@ const Home = () : JSX.Element  => {
                     <Text style={styles.buttonText}>Ranking</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.optionsButton} onPress={() => router.push('/screen/settings')}>
-                    <Text style={styles.buttonText}>Options</Text>
+                <TouchableOpacity style={styles.contactButton} onPress={() => router.push('/screen/contact')}>
+                    <Text style={styles.buttonText}>Contact</Text>
                 </TouchableOpacity>
-        </View>
+        </View> 
+                <TouchableOpacity style={styles.optionsButton} onPress={() => router.push('/screen/settings')}>
+                    <Ionicons name="settings" size={30} color="#a9a9a9" /> 
+                </TouchableOpacity>
         </View>
     );
 };
@@ -70,13 +75,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    optionsButton:{
+    contactButton:{
         width: '48%',  
         paddingVertical: 10,  
         borderRadius: 10,  
         backgroundColor: '#DFC5FE',  
         justifyContent: 'center', 
         alignItems: 'center',
+    },
+
+    optionsButton: {
+        display: 'flex',
+        justifyContent: 'flex-end'
     },
 
     rankingButton:{
@@ -94,6 +104,9 @@ const styles = StyleSheet.create({
         width: '80%',  
         marginBottom: 10,  
     },
+    optionsbutton:{
+        alignItems:"flex-end"
+    }
     
 });
 

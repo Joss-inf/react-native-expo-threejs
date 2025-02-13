@@ -18,7 +18,7 @@ const SettingsScreen = () => {
         if (music !== null) setMusicEnabled(music === "true");
         if (volume !== null) setSoundVolume(Number(volume));
       } catch (error) {
-        console.log("Erreur lors du chargement des paramètres", error);
+        console.log("Error loading settings", error);
       }
     };
 
@@ -30,9 +30,9 @@ const SettingsScreen = () => {
     try {
       await AsyncStorage.setItem("musicEnabled", JSON.stringify(musicEnabled));
       await AsyncStorage.setItem("soundVolume", soundVolume.toString());
-      alert("Paramètres enregistrés !");
+      alert("Settings saved!");
     } catch (error) {
-      console.log("Erreur lors de la sauvegarde des paramètres", error);
+      console.log("Error saving settings", error);
     }
   };
 
@@ -65,14 +65,12 @@ const SettingsScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
+           <TouchableOpacity onPress={saveSettings} style={styles.saveyou}>
+                <Text style={styles.saveme}>Save</Text>
+            </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={saveSettings}><Text style={styles.savesa}>Save</Text></TouchableOpacity>
-
-      <TouchableOpacity 
-        style={styles.backhButton} 
-        onPress={() => router.back()}
-      >
+      <TouchableOpacity style={styles.backhButton} onPress={() => router.back()}>
         <Text style={styles.backhText}>Home</Text>
       </TouchableOpacity>
     </View>
@@ -95,15 +93,15 @@ const styles = StyleSheet.create({
   },
   settingsBox: {
     backgroundColor: '#B4DEB8', 
-    borderRadius: 10, // Coins arrondis
-    padding: 15, // Espacement interne
-    width: '80%', // Occuper toute la largeur
-    marginVertical: 20, // Espacement entre les autres éléments
-    shadowColor: '#000', // Ombre du conteneur
+    borderRadius: 10, 
+    padding: 15, 
+    width: '80%', 
+    marginVertical: 20, 
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 2,
-    elevation: 2, // Ombre sous Android
+    elevation: 2, 
   },
   setting: {
     flexDirection: "row",
@@ -131,26 +129,32 @@ const styles = StyleSheet.create({
   },
   musicstart:{
     fontSize: 18,
-    color: '#ffffff', // Texte en blanc
+    color: 'white', 
+    fontWeight: 'bold',
   },
   soundvo: {
     fontSize: 18,
-    color: '#ffffff', // Texte en blanc
+    color: 'white', 
+    fontWeight: 'bold',
+  },
+  saveyou: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saveme: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 
   volumeSign: {
     fontSize: 18,
-    color: 'white',  // Signes en blanc
+    color: 'white',  
     fontWeight: 'bold',
     padding: 10,
-    backgroundColor: '#B4DEB8',  // Fond sombre pour ressortir
+    backgroundColor: '#B4DEB8',  
     borderRadius: 10
 },
- savesa: {
-    color: "white",
-    fontSize: 15,
-    fontWeight: 'bold',
- }
 });
 
 export default SettingsScreen;
