@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { GLView } from 'expo-gl';
 import { THREE } from 'expo-three'; 
 import { Renderer } from 'expo-three';
-import GameScore from "../screen/gamescore"; 
+import GameScore from '../../screen/gamescore'; 
 
 global.THREE = global.THREE || THREE
 const GameScene = () => {

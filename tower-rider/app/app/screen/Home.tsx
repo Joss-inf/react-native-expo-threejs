@@ -7,8 +7,8 @@ const Home = () : JSX.Element  => {
         <View style={styles.container}>
                 <Text style={styles.title}>Tower Rider</Text>
 
-                <TouchableOpacity style={styles.playButton} onPress={() => router.push('/screen/Game')}>
-                                <Text style={styles.buttonText}>Play</Text>
+                <TouchableOpacity style={styles.playButton} onPress={() =>router.push("/app/screen/Game")}>
+                <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.inventaryButton} onPress={() => {}}>
