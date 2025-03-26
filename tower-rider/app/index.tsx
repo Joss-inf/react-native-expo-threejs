@@ -13,7 +13,7 @@ const Home = () : JSX.Element  => {
                     <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.inventaryButton} onPress={() => router.push('/screen/inventory')}>
+                <TouchableOpacity style={styles.inventaryButton} onPress={() => router.push('/screen/Inventory')}>
                     <Text style={styles.buttonText}>Inventary</Text>
                 </TouchableOpacity>
 
