@@ -9,7 +9,7 @@ const Home = () : JSX.Element  => {
         <View style={styles.container}>
                 <Text style={styles.title}>Tower Rider</Text>
 
-                <TouchableOpacity style={styles.playButton} onPress={() => router.push('/screen/game')}>
+                <TouchableOpacity style={styles.playButton} onPress={() => router.push('/screen/Game')}>
                     <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
@@ -23,11 +23,11 @@ const Home = () : JSX.Element  => {
                     <Text style={styles.buttonText}>Ranking</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.contactButton} onPress={() => router.push('/screen/contact')}>
+                <TouchableOpacity style={styles.contactButton} onPress={() => router.push('/screen/Contact')}>
                     <Text style={styles.buttonText}>Contact</Text>
                 </TouchableOpacity>
         </View> 
-                <TouchableOpacity style={styles.optionsButton} onPress={() => router.push('/screen/settings')}>
+                <TouchableOpacity style={styles.optionsButton} onPress={() => router.push('/screen/Settings')}>
                     <Ionicons name="settings" size={30} color="#a9a9a9" /> 
                 </TouchableOpacity>
         </View>
