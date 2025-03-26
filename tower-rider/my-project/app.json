@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "tower-rider",
-    "slug": "tower-rider",
+    "name": "my-project",
+    "slug": "my-project",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -32,8 +32,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      "expo-font"
+      ]
     ],
     "experiments": {
       "typedRoutes": true

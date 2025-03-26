@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
@@ -6,7 +7,7 @@ const Home = () : JSX.Element  => {
         <View style={styles.container}>
                 <Text style={styles.title}>Tower Rider</Text>
 
-                <TouchableOpacity style={styles.playButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.playButton} onPress={() => router.replace("/screen/Game")}>
                     <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
