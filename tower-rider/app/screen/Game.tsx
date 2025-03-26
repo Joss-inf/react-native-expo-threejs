@@ -1,21 +1,47 @@
-import React, { useRef, useState } from 'react';
-import { View, StyleSheet,Modal, TouchableOpacity, Text } from 'react-native';
+import React, { useRef, useState,useEffect } from 'react';
+import { View, StyleSheet,Modal, TouchableOpacity, Text,PanResponder, ImageBackground  } from 'react-native';
 import { GLView } from 'expo-gl';
 import { THREE } from 'expo-three'; 
 import { loadTextureAsync, Renderer } from 'expo-three';
 import { Asset } from 'expo-asset';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { useRouter } from 'expo-router';
+import GameScore from './gamescore';
+
+const useSwipe = () => {
+  let direction = useRef("");
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderRelease: (_, gesture) => {
+
+      if (Math.abs(gesture.dx) > 10) {
+        direction.current =(gesture.dx > 0 ? 'right' : 'left');
+      }
+    },
+  });
+
+  return { panHandlers: panResponder.panHandlers, direction };
+};
+
+
 
 global.THREE = global.THREE || THREE;
 const GameScene = () => {
 
   const glViewRef = useRef(null);
   const isPausedRef = useRef(false)
+  const isleaving = useRef(false)
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const animationRef = useRef(null);
   const animateRef = useRef<() => void>(); 
   const router = useRouter();
+
+  const { panHandlers, direction, setDirection } = useSwipe();
+
+  const [gameOver, setGameOver] = useState(false);
+  const [playerName] = useState('OvniMan');
+  const [score, setScore] = useState(0);
 
   const pauseGame = () => {
     isPausedRef.current = true;
@@ -36,14 +62,15 @@ const GameScene = () => {
   };
 
   const quitGame = () => {
+    isleaving.current = true
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     
     }
-    router.replace('../index');
+    router.replace('/');
   };
 
-  const onContextCreate = async (gl: { drawingBufferWidth: number; drawingBufferHeight: number; endFrameEXP: () => void; }) => {
+  const onContextCreate = async (gl: { drawingBufferWidth: number; drawingBufferHeight: number; endFrameEXP: () => void;dispose: any; }) => {
 
     // Initialisation de la scène
     const scene = new THREE.Scene();
@@ -70,18 +97,18 @@ const GameScene = () => {
     // Constantes et variables globales
     // =====================
 
-  // le game over
-  let gameOver = false
+
   //liste des segments
   let platformSegments:any = [];
   const PLATFORM_WIDTH = 13.8;
+  const LANE_POSITIONS = [-PLATFORM_WIDTH/3, 0, PLATFORM_WIDTH/3];
   const PLATFORM_DEPTH = 10;
 
   //nombre de segment initial au lancement de la partie
-  const INITIAL_SEGMENTS = 26;
+  const INITIAL_SEGMENTS =30;
 
   //la distance de génération des segments
-  const generationDistance =  450;
+  const generationDistance =  500;
   //distance du ciel du joueur
   const skyDistance = -150
   //distance a laquelle les obstacles et la plateforme ce supprime par rapport au joueur pour pouvoir decharger la memoire
@@ -89,7 +116,7 @@ const GameScene = () => {
   //liste des  obstacles
   let obstacleList:any = [];
   //distance de plateforme entre les obstacles 
-  const distanceBetweenObstacles = 4
+  const distanceBetweenObstacles = 5
   //distance des obstacles entre le mur et eux
   const obstacleY = 4
   //distance du joueur de la platforme
@@ -106,14 +133,14 @@ const velocity = new THREE.Vector3();
 const SPEED = 0.5;
 
 //vitesse maximal
-const maxspeed = 10
+const maxspeed = 5
  //addtion de vitesse par execution de boucle
  const acuSpeed = 0.00009
 //gravité
 const GRAVITY = -0.01;
 //additionne le bonus
 const bonusAdditionnerStatic = bonusAdditionner
-  let score = 0
+
 
   //distance z de spawn de la plateforme
   let lastPlatformZ = 0;
@@ -130,7 +157,7 @@ const bonusAdditionnerStatic = bonusAdditionner
       skytexture.mapping = THREE.EquirectangularReflectionMapping;
       skytexture.wrapS = THREE.RepeatWrapping;
       skytexture.wrapT = THREE.RepeatWrapping;
-      skytexture.encoding = THREE.sRGBEncoding;
+    
       // Création de la sphère pour le ciel
       const geometry = new THREE.SphereGeometry(300, 15, 15);
       const material = new THREE.MeshBasicMaterial({
@@ -153,6 +180,10 @@ const platformtexture = await loadTextureAsync({ asset: require('../../assets/ga
 platformtexture.minFilter = THREE.NearestFilter
 const nmaptexture = await loadTextureAsync({ asset: require('../../assets/gameAsset/images/nmap.png') });
 nmaptexture.repeat.set(1, 2)
+const minmax= {
+  min:0.3,
+  max:0.4
+}
 class PlatformSegment {
   platformMesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial, THREE.Object3DEventMap>;
   window: any;
@@ -210,6 +241,7 @@ class PlatformSegment {
       ),
       type: obs.type,
       name:obs.model.name,
+      fallVelocity: getRandomFallVelocity(minmax.min , minmax.max ),
     };
   });
 
@@ -473,19 +505,9 @@ for (let i =- 1; i < INITIAL_SEGMENTS; i++) {
     // update des obstacles
     // =====================
     
-    const mininimum = {
-      min:0.2,
-      max:0.35
-    }
-    const maximum = {
-      min:0.4,
-      max:0.5
-    }
-    const change = 0.4
+  
+
     
-    let min = mininimum.min
-    let max  = mininimum.max
-    let veloz:any
     function updateObstacles() {
         for(let i = 0 ; i< obstacleList.length; i++){
 
@@ -498,29 +520,6 @@ for (let i =- 1; i < INITIAL_SEGMENTS; i++) {
           mesh.rotation.z += rotationV.z;
     
           // Mise à jour de la chute
-      
-          const fallV = getRandomFallVelocity(min , max );
-    
-          if(fallV < change ){
-            min = maximum.min
-            max = maximum.max
-            veloz = velocity.z
-            if(veloz != 0){
-              obstacleList[i].fallVelocity = fallV* (veloz*-1)
-            }else{
-              obstacleList[i].fallVelocity = fallV
-            }
-           
-          }else{
-            min = mininimum.min
-            max  = mininimum.max
-            if(veloz != 0){
-              obstacleList[i].fallVelocity = fallV* (veloz*-1)*1.2
-            }else{
-              obstacleList[i].fallVelocity = fallV
-            }
-          }
-
           mesh.position.z += obstacleList[i].fallVelocity;
 
       }
@@ -539,7 +538,6 @@ const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000,
 const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 cube.position.set(0, 0.5, 0);
 scene.add(cube);
-
 let player:any
 
 const p1 = Asset.fromModule(require('../../assets/gameAsset/objs/ovni.glb'));
@@ -578,7 +576,7 @@ function checkCubePlatformCollision() {
              bonus.reduceShieldBonus()
             obstacle.mesh.scale.set(0, 0, 0);
           }else{
-            gameOver = true
+            setGameOver(true)
           }
         }else if(obstacle.type == "bonus"){
           //appliquer le bonus
@@ -623,8 +621,30 @@ function updatePlatformSegments() {
 // =====================
 // fonction d update des valeurs
 // =====================
+let i = 1
 function valueUpdate(delta:any){
-    // Appliquer les mouvements
+
+  if (!gameOver && !isPausedRef.current) {
+    setScore(prevScore => prevScore + bonusAdditionner);
+  }
+
+  if(direction.current =="left"){
+    if(i-1 < 0){
+      i = 0
+    }else{
+      i -=1
+    }
+  }else if(direction.current =="right"){
+    if(i+1 > 2){
+      i = 2
+    }else{
+      i +=1
+    }
+  }
+  direction.current  = ""
+  cube.position.x = LANE_POSITIONS[i]
+  
+  // Appliquer les mouvements
     if(velocity.z < maxspeed){
       velocity.z -= acuSpeed
     }
@@ -668,8 +688,14 @@ let delta = 0;
 
     // Animation
     const animate = () => {
+      if(gameOver){
+        renderer.dispose()
+        platformSegments = []
+        obstacleList = []
+        router.back()
+      }
+      if(isleaving.current)renderer.dispose()
       requestAnimationFrame(animate);
-
       if (isPausedRef.current) return;
       delta = clock.getDelta();
        //update de la rotation des obstacles
@@ -703,18 +729,42 @@ let delta = 0;
     
     animateRef.current = animate; 
     animationRef.current = requestAnimationFrame(animate);
-  };
 
+
+
+    useEffect(() => {
+      return () => {
+          console.log("Nettoyage de la scène...");
+  
+          scene.traverse((object) => {
+              if (object.geometry) object.geometry.dispose();
+              if (object.material) {
+                  if (Array.isArray(object.material)) {
+                      object.material.forEach((mat) => mat.dispose());
+                  } else {
+                      object.material.dispose();
+                  }
+              }
+          });
+  
+          // Vider la scène
+          while (scene.children.length > 0) {
+              scene.remove(scene.children[0]);
+          }
+      };
+  }, []);
+   
+  };
+ 
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container}{...panHandlers}>
       <GLView style={styles.glView} ref={glViewRef} onContextCreate={onContextCreate} />
       
       {/* Bouton Pause */}
       <TouchableOpacity style={styles.pauseButton} onPress={pauseGame}>
         <Text style={styles.pauseButtonText}>II</Text>
       </TouchableOpacity>
-      
       {/* Menu Pause */}
       <Modal
         visible={showPauseMenu}
@@ -746,6 +796,11 @@ let delta = 0;
           </View>
         </View>
       </Modal>
+      <GameScore 
+        gameOver={gameOver}
+        playerName={playerName}
+        score={score}
+      />
     </View>
   );
 };
@@ -768,6 +823,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 10,
     borderRadius: 5,
+    zIndex: 999 
   },
   pauseButtonText: {
     color: 'white',
@@ -806,6 +862,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  score:{
+    backgroundColor: '#FFC2D8',
+  }
 });
 
 export default GameScene;
