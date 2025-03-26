@@ -1,12 +1,14 @@
+import { navigate } from "expo-router/build/global-state/routing";
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { Link, useNavigation, useRouter } from "expo-router";
 const Home = () : JSX.Element  => {
+    const router = useRouter();
     return (
         <View style={styles.container}>
                 <Text style={styles.title}>Tower Rider</Text>
 
-                <TouchableOpacity style={styles.playButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.playButton} onPress={() =>router.push("/screen/Game") }>
                     <Text style={styles.buttonText}>Play</Text>
                 </TouchableOpacity>
 
