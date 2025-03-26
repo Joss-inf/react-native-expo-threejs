@@ -1,16 +1,50 @@
-import React, { useRef, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, StyleSheet,Modal, TouchableOpacity, Text } from 'react-native';
 import { GLView } from 'expo-gl';
-import * as THREE from 'three';
+import { THREE } from 'expo-three'; 
 import { loadTextureAsync, Renderer } from 'expo-three';
 import { Asset } from 'expo-asset';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { useRouter } from 'expo-router';
 
-
+global.THREE = global.THREE || THREE;
 const GameScene = () => {
+
   const glViewRef = useRef(null);
-  const mixerRef = useRef(null);
+  const isPausedRef = useRef(false)
+  const [showPauseMenu, setShowPauseMenu] = useState(false);
+  const animationRef = useRef(null);
+  const animateRef = useRef<() => void>(); 
+  const router = useRouter();
+
+  const pauseGame = () => {
+    isPausedRef.current = true;
+    setShowPauseMenu(true);
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null; 
+    }
+  };
+  
+  const resumeGame = () => {
+    isPausedRef.current = false
+    setShowPauseMenu(false);
+    
+    if (animateRef.current && !animationRef.current) {
+      animationRef.current = requestAnimationFrame(animateRef.current);
+    }
+  };
+
+  const quitGame = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    
+    }
+    router.replace('../index');
+  };
+
   const onContextCreate = async (gl: { drawingBufferWidth: number; drawingBufferHeight: number; endFrameEXP: () => void; }) => {
+
     // Initialisation de la scène
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB); // Bleu ciel
@@ -635,6 +669,8 @@ let delta = 0;
     // Animation
     const animate = () => {
       requestAnimationFrame(animate);
+
+      if (isPausedRef.current) return;
       delta = clock.getDelta();
        //update de la rotation des obstacles
       updateObstacles()
@@ -664,16 +700,56 @@ let delta = 0;
       renderer.render(scene, camera);
       gl.endFrameEXP(); // Terminer le rendu
     };
-    animate();
+    
+    animateRef.current = animate; 
+    animationRef.current = requestAnimationFrame(animate);
   };
 
 
   return (
     <View style={styles.container}>
       <GLView style={styles.glView} ref={glViewRef} onContextCreate={onContextCreate} />
+      
+      {/* Bouton Pause */}
+      <TouchableOpacity style={styles.pauseButton} onPress={pauseGame}>
+        <Text style={styles.pauseButtonText}>II</Text>
+      </TouchableOpacity>
+      
+      {/* Menu Pause */}
+      <Modal
+        visible={showPauseMenu}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPauseMenu(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.pauseMenu}>
+            <Text style={styles.pauseMenuTitle}>Pause</Text>
+            
+            <TouchableOpacity 
+               style={styles.menuButton}
+               onPress={() => {
+               
+                 resumeGame(); 
+                 setShowPauseMenu(false);
+               }}
+             >
+               <Text style={styles.menuButtonText}>Resume</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.menuButton}
+              onPress={quitGame}
+            >
+              <Text style={styles.menuButtonText}>Quit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -684,6 +760,51 @@ const styles = StyleSheet.create({
   glView: {
     width: '100%',
     height: '100%',
+  },
+  pauseButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+    borderRadius: 5,
+  },
+  pauseButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pauseMenu: {
+    backgroundColor: '#B4DEB8',
+    padding: 15,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  pauseMenuTitle: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: "white"
+  },
+  menuButton: {
+    backgroundColor: '#FFC2D8',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  menuButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 
