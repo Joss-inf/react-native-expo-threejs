@@ -16,8 +16,7 @@ const useSwipe = () => {
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderRelease: (_, gesture) => {
-
-      if (Math.abs(gesture.dx) > 30) {
+      if (Math.abs(gesture.dx) > 50) {
         direction.current =(gesture.dx > 0 ? 'right' : 'left');
       }
     },
@@ -32,7 +31,7 @@ global.THREE = global.THREE || THREE;
 const GameScene = () => {
   const [reloadKey, setReloadKey] = useState(0);
 
-  const reloadPage = () => {
+  function reloadPage(){
     setReloadKey((prevKey) => prevKey + 1);
   };
 
@@ -40,16 +39,18 @@ const GameScene = () => {
   const isPausedRef = useRef(false)
   const isleaving = useRef(false)
   const [showPauseMenu, setShowPauseMenu] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
   const animationRef = useRef(null);
   const animateRef = useRef<() => void>(); 
   const router = useRouter();
   const pathname = usePathname();
   const { panHandlers, direction, setDirection } = useSwipe();
 
-  const [gameOver, setGameOver] = useState(false);
+  const gameOver= useRef(false);
   const [playerName] = useState('OvniMan');
   const [score, setScore] = useState(0);
-
+  const bonusScore = useRef(0)
+  const pauseScore = useRef(0)
   const pauseGame = () => {
     isPausedRef.current = true;
     setShowPauseMenu(true);
@@ -68,13 +69,14 @@ const GameScene = () => {
     }
   };
 
+
   const quitGame = () => {
     isleaving.current = true
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
+reloadPage()
     router.replace('/');
-    reloadPage
   };
 
   const onContextCreate = async (gl: { drawingBufferWidth: number; drawingBufferHeight: number; endFrameEXP: () => void;dispose: any; }) => {
@@ -128,11 +130,14 @@ const GameScene = () => {
   const obstacleY = 4
   //distance du joueur de la platforme
   const playerY = 3.9
-  //montant du bonusAdditionneur pour le score
-  let bonusAdditionner = 1
+  //taux de chance de spawn des bonus plus  cest haut - la chance que 1 des 2 bonus apparaissent est grande (  10 =  1/11, 20 = 1/21   )
+    const chance = 15
   //la mesh du bonus bouclier
   let shieldmesh:any
-
+  //bonus du score
+  const bonusAdditionner = 8
+   //bonus du timer
+  const bonusAddTimer = 600
 // Variables de mouvement et physique
 const velocity = new THREE.Vector3();
 
@@ -140,13 +145,13 @@ const velocity = new THREE.Vector3();
 const SPEED = 0.5;
 
 //vitesse maximal
-const maxspeed = 5
+const maxspeed = 8
  //addtion de vitesse par execution de boucle
  const acuSpeed = 0.00009
 //gravité
 const GRAVITY = -0.01;
 //additionne le bonus
-const bonusAdditionnerStatic = bonusAdditionner
+
 
 
   //distance z de spawn de la plateforme
@@ -410,7 +415,7 @@ for (let i =- 1; i < INITIAL_SEGMENTS; i++) {
     
       // On parcourt les colonnes restantes
       for (let i = 0; i < list.length; i++) {
-        const random = getRandomInt(20); //luck
+        const random = getRandomInt(chance); //luck
 
         if (random === 0) {
           // Bonus
@@ -448,8 +453,7 @@ for (let i =- 1; i < INITIAL_SEGMENTS; i++) {
         if(this.counterbonustimer > 0){
           this.counterbonustimer -= 1
         }else{
-          bonusAdditionner = bonusAdditionnerStatic
-
+          bonusScore.current = 0
         }
 
         if(!this.ShieldBonusAvailable() && shieldmesh){
@@ -459,7 +463,7 @@ for (let i =- 1; i < INITIAL_SEGMENTS; i++) {
         }
       }
 
-      applybonus(bonus,i){
+      applybonus(bonus:any,i:any){
 
         if(bonus.name == "counter"){  
           this.setCounterBonus()
@@ -479,21 +483,23 @@ for (let i =- 1; i < INITIAL_SEGMENTS; i++) {
     
       reduceShieldBonus(){
         if(this.shieldbonuscount > 0){
-          this.shieldbonuscount -= 1
+          this.shieldbonuscount = 0
           return 
         }
 
       }
     
       ShieldBonusAvailable(){
-        if (this.shieldbonuscount > 0)return true
+        if (this.shieldbonuscount > 0){
+          return true
+        }else{
         return false
+        }
       }
     
       setCounterBonus(){
-        this.counterbonustimer += 200
-        this.counterbonuscount += 1
-        bonusAdditionner += 1
+        bonusScore.current = bonusAdditionner
+        this.counterbonustimer = bonusAddTimer
       }
     }
     
@@ -580,13 +586,16 @@ function checkCubePlatformCollision() {
       if (cubeBox.intersectsBox(box)){
         if(obstacle.type == "malus"){
           if(bonus.ShieldBonusAvailable()){
+             const ob = obstacleList.splice(i,1)
+             scene.remove(ob[0])
              bonus.reduceShieldBonus()
-            obstacle.mesh.scale.set(0, 0, 0);
+           
           }else{
-            setGameOver(true)
-          }
+            gameOver.current = true
+            }
         }else if(obstacle.type == "bonus"){
           //appliquer le bonus
+          console.log(obstacle,i)
             bonus.applybonus(obstacle,i)
           if(obstacle.name != "shield"){
             obstacle.mesh.scale.set(0, 0, 0);
@@ -631,9 +640,6 @@ function updatePlatformSegments() {
 let i = 1
 function valueUpdate(delta:any){
 
-  if (!gameOver && !isPausedRef.current) {
-    setScore(prevScore => prevScore + bonusAdditionner);
-  }
 
   if(direction.current =="left"){
     if(i-1 < 0){
@@ -675,9 +681,7 @@ function valueUpdate(delta:any){
         shieldmesh.rotation.y = 0
         shieldmesh.rotation.x = -11.8
       }
-  if(gameOver){
-   return
-  }
+     
 }
 
 // =====================
@@ -695,9 +699,18 @@ let delta = 0;
 
     // Animation
     const animate = () => {
-      if(isleaving.current)renderer.dispose()
+      if(gameOver.current){
+        setShowGameOver(true);
+       return 
+       }
+     
       requestAnimationFrame(animate);
-      if (isPausedRef.current) return;
+      if (isPausedRef.current){
+        pauseScore.current = -1
+        return;
+      }else{
+        pauseScore.current = 0
+      }
       delta = clock.getDelta();
        //update de la rotation des obstacles
       updateObstacles()
@@ -726,24 +739,12 @@ let delta = 0;
       // Rendu
       renderer.render(scene, camera);
       gl.endFrameEXP(); // Terminer le rendu
-      if(gameOver){
-       
-        return
-      }
+     
     };
     
     animateRef.current = animate; 
     animationRef.current = requestAnimationFrame(animate);
 
-    function clean()
-      {
-        console.log("Nettoyage de la scène...");
-      obstacleList = []
-      platformSegments = []
-        renderer.clear();
-        scene = null;
-
-    }
 
   };
  
@@ -788,11 +789,32 @@ let delta = 0;
           </View>
         </View>
       </Modal>
+      <Modal
+        visible={showGameOver}
+        transparent={true}
+        animationType="fade"
+      >
+          <View style={styles.modalOverlay}>
+          <View style={styles.pauseMenu}>
+            <Text style={styles.pauseMenuTitle}>GAME OVER</Text>
+            
+            <TouchableOpacity 
+              style={styles.menuButton}
+              onPress={quitGame}
+            >
+              <Text style={styles.menuButtonText}>Quit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        </Modal>
+
       <GameScore 
         gameOver={gameOver}
         playerName={playerName}
         score={score}
-        reloadPage={reloadPage}
+        bonusScore={bonusScore}
+        pause = {pauseScore}
       />
     </View>
   );

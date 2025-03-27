@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useRouter,router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,34 +9,32 @@ interface ScoreData {
 }
 
 interface GameScoreProps {
-  gameOver: boolean;
+  gameOver: any;
   playerName: string;
+  bonusScore:any;
+  pause:any;
   resetGame?: () => void;
-  reloadPage?: () =>void;
+
 }
 
-const GameScore: React.FC<GameScoreProps> = ({ gameOver, reloadPage,playerName, resetGame }) => {
+const GameScore: React.FC<GameScoreProps> = ({ pause, bonusScore,gameOver,playerName, resetGame }) => {
 
-  useEffect(() => {
-    if (gameOver) {
-     
-      reloadPage();
-    }
-  }, [gameOver, reloadPage]); 
+ 
 
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const router = useRouter();
+ 
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!gameOver) {
-        setScore(prevScore => prevScore + 1);
+     const interval= setInterval(() => {
+      if (!gameOver.current && pause.current == 0 ) {
+        setScore(prevScore => prevScore + 1+ bonusScore.current);
       }
     }, 100);
 
     return () => clearInterval(interval);
-  }, [gameOver]);
+  }, [gameOver.current,pause.current]);
 
   useEffect(() => {
     const loadHighScore = async () => {
@@ -74,7 +72,7 @@ const GameScore: React.FC<GameScoreProps> = ({ gameOver, reloadPage,playerName, 
 
           await AsyncStorage.setItem('scores', JSON.stringify(updatedScores));
 
-          router.push('./Score');
+          
         } catch (error) {
           console.error('Erreur de sauvegarde :', error);
         }
