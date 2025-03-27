@@ -19,7 +19,7 @@ const Home = () : JSX.Element  => {
 
                 <View style={styles.buttonRow}>
 
-                <TouchableOpacity style={styles.rankingButton} onPress={() => {}}>
+                <TouchableOpacity style={styles.rankingButton} onPress={() =>  router.push('/screen/Score')}>
                     <Text style={styles.buttonText}>Ranking</Text>
                 </TouchableOpacity>
 

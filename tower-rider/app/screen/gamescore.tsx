@@ -65,7 +65,7 @@ const GameScore: React.FC<GameScoreProps> = ({ gameOver, playerName, resetGame }
 
           await AsyncStorage.setItem('scores', JSON.stringify(updatedScores));
 
-          router.push('/app/screen/Score');
+          router.push('./Score');
         } catch (error) {
           console.error('Erreur de sauvegarde :', error);
         }
