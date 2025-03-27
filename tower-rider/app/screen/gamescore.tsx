@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter,router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ScoreData {
@@ -11,10 +11,19 @@ interface ScoreData {
 interface GameScoreProps {
   gameOver: boolean;
   playerName: string;
-  resetGame?: () => void; 
+  resetGame?: () => void;
+  reloadPage?: () =>void;
 }
 
-const GameScore: React.FC<GameScoreProps> = ({ gameOver, playerName, resetGame }) => {
+const GameScore: React.FC<GameScoreProps> = ({ gameOver, reloadPage,playerName, resetGame }) => {
+
+  useEffect(() => {
+    if (gameOver) {
+     
+      reloadPage();
+    }
+  }, [gameOver, reloadPage]); 
+
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const router = useRouter();

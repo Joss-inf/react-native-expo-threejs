@@ -5,8 +5,10 @@ import { THREE } from 'expo-three';
 import { loadTextureAsync, Renderer } from 'expo-three';
 import { Asset } from 'expo-asset';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { useRouter } from 'expo-router';
+import { useRouter,usePathname  } from 'expo-router';
 import GameScore from './gamescore';
+
+
 
 const useSwipe = () => {
   let direction = useRef("");
@@ -15,7 +17,7 @@ const useSwipe = () => {
     onStartShouldSetPanResponder: () => true,
     onPanResponderRelease: (_, gesture) => {
 
-      if (Math.abs(gesture.dx) > 10) {
+      if (Math.abs(gesture.dx) > 30) {
         direction.current =(gesture.dx > 0 ? 'right' : 'left');
       }
     },
@@ -28,6 +30,11 @@ const useSwipe = () => {
 
 global.THREE = global.THREE || THREE;
 const GameScene = () => {
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const reloadPage = () => {
+    setReloadKey((prevKey) => prevKey + 1);
+  };
 
   const glViewRef = useRef(null);
   const isPausedRef = useRef(false)
@@ -36,7 +43,7 @@ const GameScene = () => {
   const animationRef = useRef(null);
   const animateRef = useRef<() => void>(); 
   const router = useRouter();
-
+  const pathname = usePathname();
   const { panHandlers, direction, setDirection } = useSwipe();
 
   const [gameOver, setGameOver] = useState(false);
@@ -65,15 +72,15 @@ const GameScene = () => {
     isleaving.current = true
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
-    
     }
     router.replace('/');
+    reloadPage
   };
 
   const onContextCreate = async (gl: { drawingBufferWidth: number; drawingBufferHeight: number; endFrameEXP: () => void;dispose: any; }) => {
 
     // Initialisation de la scène
-    const scene = new THREE.Scene();
+    let scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB); // Bleu ciel
 
     // Caméra
@@ -688,12 +695,6 @@ let delta = 0;
 
     // Animation
     const animate = () => {
-      if(gameOver){
-        renderer.dispose()
-        platformSegments = []
-        obstacleList = []
-        router.back()
-      }
       if(isleaving.current)renderer.dispose()
       requestAnimationFrame(animate);
       if (isPausedRef.current) return;
@@ -725,40 +726,30 @@ let delta = 0;
       // Rendu
       renderer.render(scene, camera);
       gl.endFrameEXP(); // Terminer le rendu
+      if(gameOver){
+       
+        return
+      }
     };
     
     animateRef.current = animate; 
     animationRef.current = requestAnimationFrame(animate);
 
+    function clean()
+      {
+        console.log("Nettoyage de la scène...");
+      obstacleList = []
+      platformSegments = []
+        renderer.clear();
+        scene = null;
 
+    }
 
-    useEffect(() => {
-      return () => {
-          console.log("Nettoyage de la scène...");
-  
-          scene.traverse((object) => {
-              if (object.geometry) object.geometry.dispose();
-              if (object.material) {
-                  if (Array.isArray(object.material)) {
-                      object.material.forEach((mat) => mat.dispose());
-                  } else {
-                      object.material.dispose();
-                  }
-              }
-          });
-  
-          // Vider la scène
-          while (scene.children.length > 0) {
-              scene.remove(scene.children[0]);
-          }
-      };
-  }, []);
-   
   };
  
 
   return (
-    <View style={styles.container}{...panHandlers}>
+    <View key = {reloadKey} style={styles.container}{...panHandlers}>
       <GLView style={styles.glView} ref={glViewRef} onContextCreate={onContextCreate} />
       
       {/* Bouton Pause */}
@@ -790,6 +781,7 @@ let delta = 0;
             <TouchableOpacity 
               style={styles.menuButton}
               onPress={quitGame}
+
             >
               <Text style={styles.menuButtonText}>Quit</Text>
             </TouchableOpacity>
@@ -800,6 +792,7 @@ let delta = 0;
         gameOver={gameOver}
         playerName={playerName}
         score={score}
+        reloadPage={reloadPage}
       />
     </View>
   );
