@@ -7,5 +7,6 @@ module.exports = {
   resolver: {
     ...defaultConfig.resolver,
     assetExts: [...defaultConfig.resolver.assetExts, 'glb','png','jpg'], // Ensure .glb is here
+    
   },
 };
