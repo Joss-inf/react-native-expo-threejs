@@ -1,3 +1,14 @@
+# jeu 3d sur react native et threejs
+
+<img width="523" height="1140" alt="image" src="https://github.com/user-attachments/assets/806d9697-1ecf-452d-89ca-71895e7bdb72" />
+
+
+
+
+
+
+
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
